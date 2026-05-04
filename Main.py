@@ -9,25 +9,27 @@ pygame.display.set_caption("Tech Fest '26")
 clock = pygame.time.Clock()
 running = True
 
+background = pygame.image.load("assets/background.png")
+
 # Idle animations
-idle_down = [pygame.transform.scale(pygame.image.load("assets/MC_DOWN1.png"), (200, 200)),
-             pygame.transform.scale(pygame.image.load("assets/MC_DOWN2.png"), (200, 200))]
-idle_up = [pygame.transform.scale(pygame.image.load("assets/MC_UP1.png"), (200, 200)),
-           pygame.transform.scale(pygame.image.load("assets/MC_UP2.png"), (200, 200))]
-idle_left = [pygame.transform.scale(pygame.image.load("assets/MC_LEFT1.png"), (200, 200)),
-             pygame.transform.scale(pygame.image.load("assets/MC_LEFT2.png"), (200, 200))]
-idle_right = [pygame.transform.scale(pygame.image.load("assets/MC_RIGHT1.png"), (200, 200)),
-              pygame.transform.scale(pygame.image.load("assets/MC_RIGHT2.png"), (200, 200))]
+idle_down = [pygame.transform.scale(pygame.image.load("assets/character/MC_DOWN1.png"), (200, 200)),
+             pygame.transform.scale(pygame.image.load("assets/character/MC_DOWN2.png"), (200, 200))]
+idle_up = [pygame.transform.scale(pygame.image.load("assets/character/MC_UP1.png"), (200, 200)),
+           pygame.transform.scale(pygame.image.load("assets/character/MC_UP2.png"), (200, 200))]
+idle_left = [pygame.transform.scale(pygame.image.load("assets/character/MC_LEFT1.png"), (200, 200)),
+             pygame.transform.scale(pygame.image.load("assets/character/MC_LEFT2.png"), (200, 200))]
+idle_right = [pygame.transform.scale(pygame.image.load("assets/character/MC_RIGHT1.png"), (200, 200)),
+              pygame.transform.scale(pygame.image.load("assets/character/MC_RIGHT2.png"), (200, 200))]
 
 # Walk animations
-walk_down = [pygame.transform.scale(pygame.image.load("assets/MC_DOWN3.png"), (200, 200)),
-             pygame.transform.scale(pygame.image.load("assets/MC_DOWN4.png"), (200, 200))]
-walk_up = [pygame.transform.scale(pygame.image.load("assets/MC_UP3.png"), (200, 200)),
-           pygame.transform.scale(pygame.image.load("assets/MC_UP4.png"), (200, 200))]
-walk_left = [pygame.transform.scale(pygame.image.load("assets/MC_LEFT3.png"), (200, 200)),
-             pygame.transform.scale(pygame.image.load("assets/MC_LEFT4.png"), (200, 200))]
-walk_right = [pygame.transform.scale(pygame.image.load("assets/MC_RIGHT3.png"), (200, 200)),
-              pygame.transform.scale(pygame.image.load("assets/MC_RIGHT4.png"), (200, 200))]
+walk_down = [pygame.transform.scale(pygame.image.load("assets/character/MC_DOWN3.png"), (200, 200)),
+             pygame.transform.scale(pygame.image.load("assets/character/MC_DOWN4.png"), (200, 200))]
+walk_up = [pygame.transform.scale(pygame.image.load("assets/character/MC_UP3.png"), (200, 200)),
+           pygame.transform.scale(pygame.image.load("assets/character/MC_UP4.png"), (200, 200))]
+walk_left = [pygame.transform.scale(pygame.image.load("assets/character/MC_LEFT3.png"), (200, 200)),
+             pygame.transform.scale(pygame.image.load("assets/character/MC_LEFT4.png"), (200, 200))]
+walk_right = [pygame.transform.scale(pygame.image.load("assets/character/MC_RIGHT3.png"), (200, 200)),
+              pygame.transform.scale(pygame.image.load("assets/character/MC_RIGHT4.png"), (200, 200))]
 
 character_rect = idle_down[0].get_rect(center=(WIDTH // 2, HEIGHT // 2))
 speed = 5
@@ -87,8 +89,7 @@ while running:
             current_frame = (current_frame + 1) % len(current_animation)
             animation_timer = 0
 
-    screen.fill((0, 0, 0))
-
+    screen.blit(background, (0, 0))
     screen.blit(current_animation[current_frame], character_rect)
 
     pygame.display.flip()
