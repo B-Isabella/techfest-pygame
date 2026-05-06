@@ -9,7 +9,27 @@ pygame.display.set_caption("Tech Fest '26")
 clock = pygame.time.Clock()
 running = True
 
+menu_font = pygame.font.Font("assets/PixelifySans-VariableFont_wght.ttf", 40)
+
 background = pygame.image.load("assets/background.png")
+menu_background = pygame.image.load("assets/menu_background.png")
+menu_background = pygame.transform.scale(menu_background, (WIDTH, HEIGHT))
+
+title_font = pygame.font.Font("assets/PixelifySans-VariableFont_wght.ttf", 80)
+title_text = title_font.render("SEQUENCE COOKING", True, (255, 255, 255))
+title_rect = title_text.get_rect(center=(WIDTH // 2, 150))
+
+sage_green = (156, 175, 136)
+light_red = (255, 120, 120)
+white = (255, 255, 255)
+
+start_button = pygame.Rect(WIDTH // 2 - 125, 300, 250, 70)
+start_button_text = menu_font.render("Start Game", True, white)
+start_button_rect = start_button_text.get_rect(center=start_button.center)
+
+quit_rect = pygame.Rect(WIDTH // 2 - 125, 400, 250, 70)
+quit_text = menu_font.render("QUIT", True, white)
+quit_text_rect = quit_text.get_rect(center=quit_rect.center)
 
 # Idle animations
 idle_down = [pygame.transform.scale(pygame.image.load("assets/character/MC_DOWN1.png"), (225, 275)),
@@ -112,89 +132,127 @@ character_rect = idle_down[0].get_rect(center=(WIDTH // 2, HEIGHT // 1.4)).infla
 object_rects = [drink_station_rect, coffee_machine_rect, grinder_rec, computer_rect, trashcan_rect,
                 order_slide_rect, counters_rect, pastries_rect, verjas_rect]
 
-speed = 5
-animation_timer = 0
-idle_animation_timer = 0
-current_frame = 0
-current_animation = idle_down
-direction = "down"
+def main_menu():
+    menu_running = True
+    while menu_running:
+        screen.blit(menu_background, (0, 0))
+        menu_mouse_pos = pygame.mouse.get_pos()
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return "QUIT"
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if start_button.collidepoint(menu_mouse_pos):
+                    return "GAME"
+                elif quit_rect.collidepoint(menu_mouse_pos):
+                    return "QUIT"
+                
+        pygame.draw.rect(screen, sage_green, start_button)
+        screen.blit(start_button_text, start_button_rect)
 
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
+        pygame.draw.rect(screen, light_red, quit_rect)
+        screen.blit(quit_text, quit_text_rect)
 
-    keys = pygame.key.get_pressed()
+        screen.blit(title_text, title_rect)
 
-    moving = False
-    new_rect = character_rect.copy()
+        pygame.display.flip()
+        clock.tick(60)
 
-    if keys[pygame.K_w] or keys[pygame.K_UP]:  # Move up
-        new_rect.y -= speed
-        current_animation = walk_up
-        direction = "up"
-        moving = True
-    if keys[pygame.K_s] or keys[pygame.K_DOWN]:  # Move down
-        new_rect.y += speed
-        current_animation = walk_down
-        direction = "down"
-        moving = True
-    if keys[pygame.K_a] or keys[pygame.K_LEFT]:  # Move left
-        new_rect.x -= speed
-        current_animation = walk_left
-        direction = "left"
-        moving = True
-    if keys[pygame.K_d] or keys[pygame.K_RIGHT]:  # Move right
-        new_rect.x += speed
-        current_animation = walk_right
-        direction = "right"
-        moving = True
+def play_game(): 
+    global character_rect
+    speed = 5
+    animation_timer = 0
+    idle_animation_timer = 0
+    current_frame = 0
+    current_animation = idle_down
+    direction = "down"
+    game_running = True
 
-    # Check for collisions with objects
-    if not any(new_rect.colliderect(obj) for obj in object_rects):
-        character_rect = new_rect
+    while game_running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return "QUIT"
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    return "MENU"
 
-    # World borders
-    character_rect.x = max(0, min(character_rect.x, WIDTH - character_rect.width))
-    character_rect.y = max(0, min(character_rect.y, HEIGHT - character_rect.height))
+        keys = pygame.key.get_pressed()
+        moving = False
+        new_rect = character_rect.copy()
 
-    if not moving:
-        if direction == "up":
-            current_animation = idle_up
-        elif direction == "down":
-            current_animation = idle_down
-        elif direction == "left":
-            current_animation = idle_left
-        elif direction == "right":
-            current_animation = idle_right
+        if keys[pygame.K_w] or keys[pygame.K_UP]:  # Move up
+            new_rect.y -= speed
+            current_animation = walk_up
+            direction = "up"
+            moving = True
+        if keys[pygame.K_s] or keys[pygame.K_DOWN]:  # Move down
+            new_rect.y += speed
+            current_animation = walk_down
+            direction = "down"
+            moving = True
+        if keys[pygame.K_a] or keys[pygame.K_LEFT]:  # Move left
+            new_rect.x -= speed
+            current_animation = walk_left
+            direction = "left"
+            moving = True
+        if keys[pygame.K_d] or keys[pygame.K_RIGHT]:  # Move right
+            new_rect.x += speed
+            current_animation = walk_right
+            direction = "right"
+            moving = True
 
-        idle_animation_timer += clock.get_time()
-        if idle_animation_timer > 500:
-            current_frame = (current_frame + 1) % len(current_animation)
-            idle_animation_timer = 0
-    else:
-        animation_timer += clock.get_time()
-        if animation_timer > 200:
-            current_frame = (current_frame + 1) % len(current_animation)
-            animation_timer = 0
+        # Check for collisions with objects
+        if not any(new_rect.colliderect(obj) for obj in object_rects):
+            character_rect = new_rect
 
-    # Draw everything
-    screen.blit(background, (0, 0))
+        # World borders
+        character_rect.x = max(0, min(character_rect.x, WIDTH - character_rect.width))
+        character_rect.y = max(0, min(character_rect.y, HEIGHT - character_rect.height))
 
-    screen.blit(verjas, (-5, 370))
-    screen.blit(trashcan, (900, 620))
-    screen.blit(order_slide, (-5, 30))
-    screen.blit(counters, (160, 250))
-    screen.blit(computer, (850, 300))
-    screen.blit(pastries, (-15, 500))
+        if not moving:
+            if direction == "up":
+                current_animation = idle_up
+            elif direction == "down":
+                current_animation = idle_down
+            elif direction == "left":
+                current_animation = idle_left
+            elif direction == "right":
+                current_animation = idle_right
 
-    screen.blit(coffee_grinder, (680, 260))
-    screen.blit(coffee_machine, (535, 240))
-    screen.blit(drink_station, (360, 240))
+            idle_animation_timer += clock.get_time()
+            if idle_animation_timer > 500:
+                current_frame = (current_frame + 1) % len(current_animation)
+                idle_animation_timer = 0
+        else:
+            animation_timer += clock.get_time()
+            if animation_timer > 200:
+                current_frame = (current_frame + 1) % len(current_animation)
+                animation_timer = 0
 
-    screen.blit(current_animation[current_frame], character_rect.inflate(100, 100).topleft)
+        # Draw everything
+        screen.blit(background, (0, 0))
 
-    pygame.display.flip()
-    clock.tick(60)
+        screen.blit(verjas, (-5, 370))
+        screen.blit(trashcan, (900, 620))
+        screen.blit(order_slide, (-5, 30))
+        screen.blit(counters, (160, 250))
+        screen.blit(computer, (850, 300))
+        screen.blit(pastries, (-15, 500))
+
+        screen.blit(coffee_grinder, (680, 260))
+        screen.blit(coffee_machine, (535, 240))
+        screen.blit(drink_station, (360, 240))
+
+        screen.blit(current_animation[current_frame], character_rect.inflate(100, 100).topleft)
+
+        pygame.display.flip()
+        clock.tick(60)
+
+state = "MENU"
+while state != "QUIT":
+    if state == "MENU":
+        state = main_menu()
+    elif state == "GAME":
+        state = play_game()
 
 pygame.quit()
