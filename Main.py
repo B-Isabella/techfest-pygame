@@ -12,24 +12,31 @@ running = True
 background = pygame.image.load("assets/background.png")
 
 # Idle animations
-idle_down = [pygame.transform.scale(pygame.image.load("assets/character/MC_DOWN1.png"), (200, 200)),
-             pygame.transform.scale(pygame.image.load("assets/character/MC_DOWN2.png"), (200, 200))]
-idle_up = [pygame.transform.scale(pygame.image.load("assets/character/MC_UP1.png"), (200, 200)),
-           pygame.transform.scale(pygame.image.load("assets/character/MC_UP2.png"), (200, 200))]
-idle_left = [pygame.transform.scale(pygame.image.load("assets/character/MC_LEFT1.png"), (200, 200)),
-             pygame.transform.scale(pygame.image.load("assets/character/MC_LEFT2.png"), (200, 200))]
-idle_right = [pygame.transform.scale(pygame.image.load("assets/character/MC_RIGHT1.png"), (200, 200)),
-              pygame.transform.scale(pygame.image.load("assets/character/MC_RIGHT2.png"), (200, 200))]
+idle_down = [pygame.transform.scale(pygame.image.load("assets/character/MC_DOWN1.png"), (225, 275)),
+             pygame.transform.scale(pygame.image.load("assets/character/MC_DOWN2.png"), (225, 275))]
+idle_up = [pygame.transform.scale(pygame.image.load("assets/character/MC_UP1.png"), (225, 275)),
+           pygame.transform.scale(pygame.image.load("assets/character/MC_UP2.png"), (225, 275))]
+idle_left = [pygame.transform.scale(pygame.image.load("assets/character/MC_LEFT1.png"), (225, 275)),
+             pygame.transform.scale(pygame.image.load("assets/character/MC_LEFT2.png"), (225, 275))]
+idle_right = [pygame.transform.scale(pygame.image.load("assets/character/MC_RIGHT1.png"), (225, 275)),
+              pygame.transform.scale(pygame.image.load("assets/character/MC_RIGHT2.png"), (225, 275))]
 
 # Walk animations
-walk_down = [pygame.transform.scale(pygame.image.load("assets/character/MC_DOWN3.png"), (200, 200)),
-             pygame.transform.scale(pygame.image.load("assets/character/MC_DOWN4.png"), (200, 200))]
-walk_up = [pygame.transform.scale(pygame.image.load("assets/character/MC_UP3.png"), (200, 200)),
-           pygame.transform.scale(pygame.image.load("assets/character/MC_UP4.png"), (200, 200))]
-walk_left = [pygame.transform.scale(pygame.image.load("assets/character/MC_LEFT3.png"), (200, 200)),
-             pygame.transform.scale(pygame.image.load("assets/character/MC_LEFT4.png"), (200, 200))]
-walk_right = [pygame.transform.scale(pygame.image.load("assets/character/MC_RIGHT3.png"), (200, 200)),
-              pygame.transform.scale(pygame.image.load("assets/character/MC_RIGHT4.png"), (200, 200))]
+walk_down = [pygame.transform.scale(pygame.image.load("assets/character/MC_DOWN3.png"), (225, 275)),
+             pygame.transform.scale(pygame.image.load("assets/character/MC_DOWN4.png"), (225, 275))]
+walk_up = [pygame.transform.scale(pygame.image.load("assets/character/MC_UP3.png"), (225, 275)),
+           pygame.transform.scale(pygame.image.load("assets/character/MC_UP4.png"), (225, 275))]
+walk_left = [pygame.transform.scale(pygame.image.load("assets/character/MC_LEFT3.png"), (225, 275)),
+             pygame.transform.scale(pygame.image.load("assets/character/MC_LEFT4.png"), (225, 275))]
+walk_right = [pygame.transform.scale(pygame.image.load("assets/character/MC_RIGHT3.png"), (225, 275)),
+              pygame.transform.scale(pygame.image.load("assets/character/MC_RIGHT4.png"), (225, 275))]
+
+# objects
+trashcan = pygame.transform.scale(pygame.image.load("assets/objects/zafacon_lol.png"), (70, 70))
+order_slide = pygame.transform.scale(pygame.image.load("assets/objects/orderslide.png"), (1000, 100))
+computer = pygame.transform.scale(pygame.image.load("assets/objects/computer.png"), (75, 75))
+coffee_machine = pygame.transform.scale(pygame.image.load("assets/objects/coffee_machine.png"), (200, 200))
+coffee_grinder = pygame.transform.scale(pygame.image.load("assets/objects/coffee_grinder.png"), (200, 200))
 
 character_rect = idle_down[0].get_rect(center=(WIDTH // 2, HEIGHT // 2))
 speed = 5
@@ -90,6 +97,13 @@ while running:
             animation_timer = 0
 
     screen.blit(background, (0, 0))
+
+    screen.blit(trashcan, (1215, 720)) 
+    screen.blit(order_slide, (-5, 25))
+    screen.blit(computer, (1100, 350)) 
+    screen.blit(coffee_machine, (200, 300))
+    screen.blit(coffee_grinder, (400, 300))
+
     screen.blit(current_animation[current_frame], character_rect)
 
     pygame.display.flip()
