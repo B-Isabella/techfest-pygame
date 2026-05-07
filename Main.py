@@ -11,7 +11,7 @@ pygame.display.set_caption("Tech Fest '26")
 clock = pygame.time.Clock()
 running = True
 
-#Menu elements...
+# Menu elements...
 
 menu_font = pygame.font.Font("assets/PixelifySans-VariableFont_wght.ttf", 40)
 
@@ -35,14 +35,18 @@ quit_rect = pygame.Rect(WIDTH // 2 - 125, 400, 250, 70)
 quit_text = menu_font.render("QUIT", True, white)
 quit_text_rect = quit_text.get_rect(center=quit_rect.center)
 
-
+# Day cycle variables
+current_day = 1
+daily_score = 0
+orders_completed = 0
+MAX_ORDERS_PER_DAY = 10
 
 menu = ["Croissant", "Cinnamon Roll", "Strawberry Shortcake", "Coffee Cake", "Carrot Cake"]
 coffee_menu = ["Latte", "Cappuccino", "Cold Brew"]
 inventory = []
 MAX_CARRY = 3
 score = 0
-font       = pygame.font.SysFont("Arial", 28, bold=True)
+font = pygame.font.SysFont("Arial", 28, bold=True)
 small_font = pygame.font.SysFont("Arial", 20, bold=True)
 order_font = pygame.font.SysFont("Arial", 20, bold=True)
 tiny_font  = pygame.font.SysFont("Arial", 14, bold=True)
@@ -317,7 +321,7 @@ def main_menu():
         clock.tick(60)
 
 def play_game():
-    global running, score, coffee_step, current_order, character_rect
+    global running, score, daily_score, coffee_step, current_order, character_rect, orders_completed, current_day
     speed             = 5
     animation_timer   = 0
     idle_animation_timer = 0
@@ -370,7 +374,7 @@ def play_game():
                             build_coffee_panel()
                             break
 
-                #Trash
+                # Trash
                 elif near_trash:
                     for i in range(len(inventory)):
                         item_rect = pygame.Rect(22, 78 + (i + 1) * 28, 270, 26)
@@ -379,25 +383,39 @@ def play_game():
                             set_feedback(f"Trashed {removed}!")
                             break
 
-                #Drop-off 
+                # Drop-off 
                 elif near_dropoff:
                     delivered = []
                     for item in list(inventory):
                         if item in current_order:
                             current_order.remove(item)
                             score += 15
+                            daily_score += 15
                             delivered.append(item)
                         else:
                             score -= 5
+                            daily_score -= 5
+
                     for item in delivered:
                         inventory.remove(item)
+
                     if delivered:
                         set_feedback(f"Served: {', '.join(delivered)}! +{15*len(delivered)} pts", 160)
                     else:
                         set_feedback("Wrong items! Click them in your list near the trash.", 160)
+
                     if not current_order:
+                        orders_completed += 1
                         current_order = generate_order()
-                        set_feedback("Order complete! New order up!", 180)
+                        set_feedback(f"Order complete! ({orders_completed}/{MAX_ORDERS_PER_DAY})", 180)
+
+                        # Day ends after 10 orders
+                        if orders_completed >= MAX_ORDERS_PER_DAY:
+                            current_day += 1
+                            daily_score = 0
+                            orders_completed = 0
+                            current_order = generate_order()
+                            set_feedback(f"DAY {current_day-1} COMPLETE! New day started!", 300)
 
                 elif near_grinder:
                     if coffee_step is None:
@@ -415,7 +433,7 @@ def play_game():
                     else:
                         set_feedback("Already brewed! Pick a drink from the top-left panel.")
 
-        #Movement
+        # Movement
         keys   = pygame.key.get_pressed()
         moving = False
         new_rect = character_rect.copy()
@@ -519,31 +537,45 @@ def play_game():
             [f"Carrying ({len(inventory)}/{MAX_CARRY}):"] + [f"  - {item}" for item in inventory]
             if inventory else ["Carrying: Nothing"]
         )
-        box_h = 20 + len(inv_lines) * 28 + 36
+        box_h = 20 + len(inv_lines) * 28 + 70
         pygame.draw.rect(screen, (255, 255, 255), (10, 70, 310, box_h), border_radius=12)
         pygame.draw.rect(screen, (180, 180, 180), (10, 70, 310, box_h), 2, border_radius=12)
+
         for i, line in enumerate(inv_lines):
             color = (0, 0, 0) if i == 0 else (60, 60, 150)
             txt = small_font.render(line, True, color)
             screen.blit(txt, (22, 78 + i * 28))
+
             if near_trash and i > 0:
                 h = tiny_font.render("[click to trash]", True, (180, 60, 60))
                 screen.blit(h, (22 + txt.get_width() + 6, 78 + i * 28 + 4))
+
         screen.blit(font.render(f"Tips: ${score}", True, (0, 150, 0)), (22, 78 + len(inv_lines) * 28))
+
+        # Day info
+        day_progress = font.render(
+            f"Day {current_day} | Orders: {orders_completed}/{MAX_ORDERS_PER_DAY}",
+            True,
+            (255, 200, 0)
+        )
+        screen.blit(day_progress, (22, 78 + len(inv_lines) * 28 + 35))
 
         # Current order box (top right)
         order_lines = ["Current Order:"] + [f"  - {item}" for item in current_order]
         max_w = max(order_font.size(l)[0] for l in order_lines) + 30
         order_box_h = 14 + len(order_lines) * 28 + 10
         obx = WIDTH - max_w - 14
+
         pygame.draw.rect(screen, (255, 245, 220), (obx, 70, max_w, order_box_h), border_radius=12)
         pygame.draw.rect(screen, (180, 120,  60), (obx, 70, max_w, order_box_h), 2, border_radius=12)
+
         for i, line in enumerate(order_lines):
             color = (100, 50, 0) if i == 0 else (60, 20, 0)
             screen.blit(order_font.render(line, True, color), (obx + 12, 70 + 10 + i * 28))
 
         # Context hints
         hint_text = None
+
         if near_pastries:
             hint_text = "Click a pastry to pick it up"
         elif near_grinder and coffee_step is None:
@@ -572,6 +604,7 @@ def play_game():
 
         pygame.display.flip()
         clock.tick(60)
+
     return "MENU"
         
 
